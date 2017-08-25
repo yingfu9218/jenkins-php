@@ -1,7 +1,7 @@
 FROM jenkins
 # if we want to install via apt
 USER root
-RUN apt-get update && apt-get install -y php  curl php-pear php-xdebug nodejs ant rsync vim ansible
+RUN apt-get update && apt-get install -y php  curl php-curl php-pear php-xdebug nodejs ant rsync vim ansible
 # drop back to the regular jenkins user - good practice
 RUN mkdir /home/jenkins
 RUN chown jenkins:jenkins /home/jenkins
