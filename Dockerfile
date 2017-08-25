@@ -4,7 +4,7 @@ USER root
 RUN apt-get update && apt-get install -y php  curl php-curl php-pear php-xdebug   ant rsync vim ansible
 #  install nodejs
 RUN git clone https://github.com/nodejs/node.git
-RUN sudo chmod -R 755 node 
+RUN chmod -R 755 node 
 RUN cd node &&  ./configure && make && make install 
 
 # drop back to the regular jenkins user - good practice
