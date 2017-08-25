@@ -1,7 +1,7 @@
 FROM jenkins
 # if we want to install via apt
 USER root
-RUN apt-get update && apt-get install -y php  curl php-curl php-pear php-xdebug   ant rsync vim ansible
+RUN apt-get update && apt-get install -y php  curl php-curl php-pear php-xdebug  make ant rsync vim ansible
 #  install nodejs
 RUN git clone https://github.com/nodejs/node.git
 RUN chmod -R 755 node 
