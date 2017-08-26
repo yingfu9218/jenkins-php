@@ -1,7 +1,7 @@
 FROM jenkins
 # if we want to install via apt
 USER root
-RUN apt-get update && apt-get install -y php  curl php-curl php-pear php-xdebug nodejs ant rsync vim ansible
+RUN apt-get update && apt-get install -y php  curl php-curl php-pear php-xdebug ant rsync vim ansible
 
 
 # drop back to the regular jenkins user - good practice
@@ -18,8 +18,6 @@ RUN /home/jenkins/composer.phar --working-dir="/home/jenkins" -n require phing/p
 RUN echo "export PATH=$PATH:/home/jenkins/.composer/vendor/bin" >> /var/jenkins_home/.bashrc 
 
 
-RUN groupadd --gid 1000 node \
-  && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
 
 # gpg keys listed at https://github.com/nodejs/node#release-team
 RUN set -ex \
