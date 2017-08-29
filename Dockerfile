@@ -59,7 +59,7 @@ RUN set -ex \
   && ln -s /opt/yarn/bin/yarn /usr/local/bin/yarn \
   && ln -s /opt/yarn/bin/yarn /usr/local/bin/yarnpkg \
   && rm yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz
-  
+RUN npm install -g cnpm --registry=https://registry.npm.taobao.org  
 # drop back to the regular jenkins user - good practice
 RUN mkdir /home/jenkins
 RUN chown jenkins:jenkins /home/jenkins
