@@ -1,7 +1,7 @@
 FROM jenkins
 # if we want to install via apt
 USER root
-RUN apt-get update && apt-get install -y php  curl php-curl php-pear  php-xdebug  ant rsync vim ansible
+RUN apt-get update && apt-get install -y php  curl php-curl php-pear  php-xdebug  php-gd php-mbstring php-devel php-mcrypt php-xml php-mysql ant rsync vim ansible
 
 # install nodejs
 # gpg keys listed at https://github.com/nodejs/node#release-team
@@ -66,6 +66,7 @@ RUN chown jenkins:jenkins /home/jenkins
 USER jenkins
 # Install composer, yes we can't install it in $JENKINS_HOME :(
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/home/jenkins
+RUN cp /home/jenkins/composer.phar /usr/bin/composer
 RUN ls -lh /home/jenkins/
 # Install required php tools.
 RUN /home/jenkins/composer.phar --working-dir="/home/jenkins" -n require phing/phing:2.* notfloran/phing-composer-security-checker:~1.0 \
