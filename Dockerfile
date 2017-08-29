@@ -1,7 +1,7 @@
 FROM jenkins
 # if we want to install via apt
 USER root
-RUN apt-get update && apt-get install -y php  curl php-curl php-pear  php-xdebug  php-gd php-mbstring php-devel php-mcrypt php-xml php-mysql ant rsync vim ansible
+RUN apt-get update && apt-get install -y php  curl php-curl php-pear  php-xdebug  php-gd php-mbstring  php-mcrypt php-xml php-mysql ant rsync vim ansible
 
 # install nodejs
 # gpg keys listed at https://github.com/nodejs/node#release-team
