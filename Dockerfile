@@ -2,7 +2,8 @@ FROM jenkins
 # if we want to install via apt
 USER root
 # 时区设置
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime \
+  && echo 'Asia/Shanghai' >/etc/timezone 
 RUN apt-get update && apt-get install -y php  curl php-curl php-pear  php-xdebug  php-gd php-mbstring  php-mcrypt php-xml php-mysql ant rsync vim ansible
 
 # install nodejs
