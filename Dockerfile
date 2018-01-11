@@ -76,6 +76,8 @@ RUN /home/jenkins/composer.phar --working-dir="/home/jenkins" -n require phing/p
     phploc/phploc:* phpunit/phpunit:~4.0 pdepend/pdepend:~2.0 phpmd/phpmd:~2.2 sebastian/phpcpd:* \
    squizlabs/php_codesniffer:* mayflower/php-codebrowser:~1.1 codeception/codeception:*
 #RUN echo "export PATH=$PATH:/home/jenkins/.composer/vendor/bin" >> /var/jenkins_home/.bashrc 
+#设置中国composer源
+RUN /home/jenkins/composer.phar config -g repo.packagist composer https://packagist.phpcomposer.com
 
 
 
