@@ -4,7 +4,7 @@ USER root
 # 时区设置
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime \
   && echo 'Asia/Shanghai' >/etc/timezone 
-RUN apt-get update && apt-get install -y php  curl php-curl php-pear  php-xdebug  php-gd php-mbstring  php-mcrypt php-xml php-mysql php-bcmath ant rsync vim ansible
+RUN apt-get update && apt-get install -y php  curl php-curl php-pear  php-xdebug  php-gd php-mbstring  php-mcrypt php-xml php-mysql php-bcmath php-mongodb  ant rsync vim ansible
 
 # install nodejs
 # gpg keys listed at https://github.com/nodejs/node#release-team
