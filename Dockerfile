@@ -4,7 +4,15 @@ USER root
 # 时区设置
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime \
   && echo 'Asia/Shanghai' >/etc/timezone 
-RUN apt-get update && apt-get install -y php  curl php-curl php-pear  php-xdebug  php-gd php-mbstring  php-mcrypt php-xml php-mysql php-bcmath php-mongodb  ant rsync vim ansible
+RUN apt-get update && apt-get install -y php  curl php-curl php-pear  php-xdebug  php-gd php-mbstring  php-mcrypt php-xml php-mysql php-bcmath php-dev   ant rsync vim ansible
+
+RUN wget http://pecl.php.net/get/mongodb-1.5.2.tgz && tar -zxvf mongodb-1.5.2.tgz
+RUN cd mongodb-1.5.2 && /usr/bin/phpize && ./configure --with-php-config=/usr/bin/php-config && make && make install
+RUN cd ../
+RUN rm -f  mongodb-1.5.2.tgz && rm -rf  mongodb-1.5.2
+
+RUN echo "extension=mongodb.so" >> /etc/php/7.0/cli/conf.d/mongodb.ini
+
 
 # install nodejs
 # gpg keys listed at https://github.com/nodejs/node#release-team
@@ -46,22 +54,6 @@ RUN ARCH= && dpkgArch="$(dpkg --print-architecture)" \
 
 ENV YARN_VERSION 0.27.5
 
-RUN set -ex \
-  && for key in \
-    6A010C5166006599AA17F08146C2130DFD2497F5 \
-  ; do \
-    gpg --keyserver pgp.mit.edu --recv-keys "$key" || \
-    gpg --keyserver keyserver.pgp.com --recv-keys "$key" || \
-    gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key" ; \
-  done \
-  && curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz" \
-  && curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz.asc" \
-  && gpg --batch --verify yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz \
-  && mkdir -p /opt/yarn \
-  && tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/yarn --strip-components=1 \
-  && ln -s /opt/yarn/bin/yarn /usr/local/bin/yarn \
-  && ln -s /opt/yarn/bin/yarn /usr/local/bin/yarnpkg \
-  && rm yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz
   
 RUN npm install -g cnpm --registry=http://registry.npm.taobao.org
 # drop back to the regular jenkins user - good practice
