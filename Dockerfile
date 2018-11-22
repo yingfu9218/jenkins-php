@@ -59,7 +59,12 @@ RUN npm install -g cnpm --registry=http://registry.npm.taobao.org
 # drop back to the regular jenkins user - good practice
 RUN mkdir /home/jenkins
 RUN chown jenkins:jenkins /home/jenkins
+
+# Install docker client
+RUN wget https://download.docker.com/linux/static/stable/x86_64/docker-18.06.1-ce.tgz && tar -zxvf docker-18.06.1-ce.tgz && rm -f docker-18.06.1-ce.tgz && cp docker/* /usr/bin/
+
 USER jenkins
+
 # Install composer, yes we can't install it in $JENKINS_HOME :(
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/home/jenkins
 RUN ls -lh /home/jenkins/
