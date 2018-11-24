@@ -15,30 +15,13 @@ RUN echo "extension=mongodb.so" >> /etc/php/7.0/cli/conf.d/mongodb.ini
 
 
 # install nodejs
-# gpg keys listed at https://github.com/nodejs/node#release-team
+
+RUN wget https://nodejs.org/dist/v10.13.0/node-v10.13.0-linux-x64.tar.xz && xz -d node-v10.13.0-linux-x64.tar.xz && tar -xvf node-v10.13.0-linux-x64.tar && rm -f node-v10.13.0-linux-x64.tar.xz  && mv node-v10.13.0-linux-x64 /usr/local/node
 
 
-ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 8.4.0
+ 
+ENV PATH /usr/local/node/bin:$PATH
 
-RUN ARCH= && dpkgArch="$(dpkg --print-architecture)" \
-  && case "${dpkgArch##*-}" in \
-    amd64) ARCH='x64';; \
-    ppc64el) ARCH='ppc64le';; \
-    s390x) ARCH='s390x';; \
-    arm64) ARCH='arm64';; \
-    armhf) ARCH='armv7l';; \
-    *) echo "unsupported architecture"; exit 1 ;; \
-  esac \
-  && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-$ARCH.tar.xz" \
-  && curl -SLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
-  && gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \
-  && grep " node-v$NODE_VERSION-linux-$ARCH.tar.xz\$" SHASUMS256.txt | sha256sum -c - \
-  && tar -xJf "node-v$NODE_VERSION-linux-$ARCH.tar.xz" -C /usr/local --strip-components=1 \
-  && rm "node-v$NODE_VERSION-linux-$ARCH.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt \
-  && ln -s /usr/local/bin/node /usr/local/bin/nodejs
-
-ENV YARN_VERSION 0.27.5
 
   
 RUN npm install -g cnpm --registry=http://registry.npm.taobao.org
@@ -49,18 +32,27 @@ RUN chown jenkins:jenkins /home/jenkins
 # Install docker client
 RUN wget https://download.docker.com/linux/static/stable/x86_64/docker-18.06.1-ce.tgz && tar -zxvf docker-18.06.1-ce.tgz && rm -f docker-18.06.1-ce.tgz && cp docker/* /usr/bin/
 
-USER jenkins
-
 # Install composer, yes we can't install it in $JENKINS_HOME :(
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/home/jenkins
-RUN ls -lh /home/jenkins/
+
+
+
+RUN ln -s /home/jenkins/composer.phar /usr/local/bin/composer
+
+
+
+
+USER jenkins
+
 # Install required php tools.
-RUN /home/jenkins/composer.phar --working-dir="/home/jenkins" -n require phing/phing:2.* notfloran/phing-composer-security-checker:~1.0 \
-    phploc/phploc:* phpunit/phpunit:~4.0 pdepend/pdepend:~2.0 phpmd/phpmd:~2.2 sebastian/phpcpd:* \
-   squizlabs/php_codesniffer:* mayflower/php-codebrowser:~1.1 codeception/codeception:*
-#RUN echo "export PATH=$PATH:/home/jenkins/.composer/vendor/bin" >> /var/jenkins_home/.bashrc 
+#RUN /home/jenkins/composer.phar --working-dir="/home/jenkins" -n require phing/phing:2.* notfloran/phing-composer-security-checker:~1.0 \
+#    phploc/phploc:* phpunit/phpunit:~4.0 pdepend/pdepend:~2.0 phpmd/phpmd:~2.2 sebastian/phpcpd:* \
+#   squizlabs/php_codesniffer:* mayflower/php-codebrowser:~1.1 codeception/codeception:*
+
 #设置为中国composer源
 RUN /home/jenkins/composer.phar config -g repo.packagist composer https://packagist.phpcomposer.com
+
+
 
 
 
