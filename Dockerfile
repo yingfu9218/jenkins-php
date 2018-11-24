@@ -34,12 +34,7 @@ RUN wget https://download.docker.com/linux/static/stable/x86_64/docker-18.06.1-c
 
 # Install composer, yes we can't install it in $JENKINS_HOME :(
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/home/jenkins
-
-
-
 RUN ln -s /home/jenkins/composer.phar /usr/local/bin/composer
-
-
 
 
 USER jenkins
