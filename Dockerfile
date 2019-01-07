@@ -1,4 +1,4 @@
-FROM jenkins
+FROM jenkins:2.60.3
 # if we want to install via apt
 USER root
 # 时区设置
