@@ -1,10 +1,10 @@
-FROM jenkins/jenkins:2.162
+FROM jenkins/jenkins:2.167
 # if we want to install via apt
 USER root
 # 时区设置
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime \
   && echo 'Asia/Shanghai' >/etc/timezone 
-RUN apt-get update && apt-get install -y php  curl php-curl php-pear  php-xdebug  php-gd php-mbstring  php-mcrypt php-xml php-mysql php-bcmath php-dev   ant rsync vim ansible
+RUN apt-get update && apt-get install -y php  curl php-curl php-pear  php-xdebug  php-gd php-mbstring  php-mcrypt php-xml php-mysql php-bcmath php-dev php-zip  ant rsync vim 
 
 RUN wget http://pecl.php.net/get/mongodb-1.5.2.tgz && tar -zxvf mongodb-1.5.2.tgz
 RUN cd mongodb-1.5.2 && /usr/bin/phpize && ./configure --with-php-config=/usr/bin/php-config && make && make install
