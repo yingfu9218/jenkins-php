@@ -24,6 +24,7 @@ ENV PATH /usr/local/node/bin:$PATH
 
 
 RUN npm install -g cnpm --registry=http://registry.npm.taobao.org
+RUN npm install -g @vue/cli
 # drop back to the regular jenkins user - good practice
 # drop back to the regular jenkins user - good practice
 RUN mkdir /home/jenkins
