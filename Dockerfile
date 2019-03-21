@@ -51,9 +51,9 @@ USER jenkins
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/home/jenkins
 RUN ls -lh /home/jenkins/
 # Install required php tools.
-#RUN /home/jenkins/composer.phar --working-dir="/home/jenkins" -n require phing/phing:2.* notfloran/phing-composer-security-checker:~1.0 \
-#    phploc/phploc:* phpunit/phpunit:~4.0 pdepend/pdepend:~2.0 phpmd/phpmd:~2.2 sebastian/phpcpd:* \
-#   squizlabs/php_codesniffer:* mayflower/php-codebrowser:~1.1 codeception/codeception:*
+RUN /home/jenkins/composer.phar --working-dir="/home/jenkins" -n require phing/phing:2.* notfloran/phing-composer-security-checker:~1.0 \
+    phploc/phploc:* phpunit/phpunit:~4.0 pdepend/pdepend:~2.0 phpmd/phpmd:~2.2 sebastian/phpcpd:* \
+   squizlabs/php_codesniffer:* mayflower/php-codebrowser:~1.1 codeception/codeception:*
 #RUN echo "export PATH=$PATH:/home/jenkins/.composer/vendor/bin" >> /var/jenkins_home/.bashrc 
 #设置中国composer源
 RUN /home/jenkins/composer.phar config -g repo.packagist composer https://packagist.phpcomposer.com
