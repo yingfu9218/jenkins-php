@@ -25,8 +25,25 @@ ENV PATH /usr/local/node/bin:$PATH
 
 RUN npm install -g cnpm --registry=http://registry.npm.taobao.org
 RUN npm install -g @vue/cli
-# drop back to the regular jenkins user - good practice
-# drop back to the regular jenkins user - good practice
+
+# 安装puppeteer依赖环境
+
+RUN apt-get update && \
+    apt-get -y install xvfb gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 \
+      libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 \
+      libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 \
+      libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 \
+      libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN  groupadd -r pptruser \
+   &&  usermod -a -G audio jenkins \
+    && usermod -a -G video jenkins \
+    && usermod -a -G pptruser jenkins \
+    && mkdir -p /home/pptruser/Downloads \
+    && chown -R jenkins:jenkins /home/pptruser
+
+
 RUN mkdir /home/jenkins
 RUN chown jenkins:jenkins /home/jenkins
 USER jenkins
@@ -34,9 +51,9 @@ USER jenkins
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/home/jenkins
 RUN ls -lh /home/jenkins/
 # Install required php tools.
-RUN /home/jenkins/composer.phar --working-dir="/home/jenkins" -n require phing/phing:2.* notfloran/phing-composer-security-checker:~1.0 \
-    phploc/phploc:* phpunit/phpunit:~4.0 pdepend/pdepend:~2.0 phpmd/phpmd:~2.2 sebastian/phpcpd:* \
-   squizlabs/php_codesniffer:* mayflower/php-codebrowser:~1.1 codeception/codeception:*
+#RUN /home/jenkins/composer.phar --working-dir="/home/jenkins" -n require phing/phing:2.* notfloran/phing-composer-security-checker:~1.0 \
+#    phploc/phploc:* phpunit/phpunit:~4.0 pdepend/pdepend:~2.0 phpmd/phpmd:~2.2 sebastian/phpcpd:* \
+#   squizlabs/php_codesniffer:* mayflower/php-codebrowser:~1.1 codeception/codeception:*
 #RUN echo "export PATH=$PATH:/home/jenkins/.composer/vendor/bin" >> /var/jenkins_home/.bashrc 
 #设置中国composer源
 RUN /home/jenkins/composer.phar config -g repo.packagist composer https://packagist.phpcomposer.com
