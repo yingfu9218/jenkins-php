@@ -123,6 +123,8 @@ RUN set -eux; \
     libssl-dev \
     libxml2-dev \
     zlib1g-dev \
+    libjpeg-dev \
+    libpng-dev \
     ${PHP_EXTRA_BUILD_DEPS:-} \
   ; \
   rm -rf /var/lib/apt/lists/*; \
@@ -170,6 +172,8 @@ RUN set -eux; \
     --with-libedit \
     --with-openssl \
     --with-zlib \
+    --with-gd \
+
     \
 # bundled pcre does not support JIT on s390x
 # https://manpages.debian.org/stretch/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
@@ -185,7 +189,7 @@ RUN set -eux; \
   make clean; \
   \
 # https://github.com/docker-library/php/issues/692 (copy default example "php.ini" files somewhere easily discoverable)
-  cp -v php.ini-* "$PHP_INI_DIR/"; \
+  cp -v php.ini-* "$PHP_INI_DIR/"; \  
   \
   cd /; \
   docker-php-source delete; \
@@ -210,17 +214,23 @@ RUN set -eux; \
 RUN ln -s  /usr/local/php7.2/bin/php /usr/bin/php72
 RUN  php72 --version
 
-
-# 安装7.2  composer
-RUN mkdir /usr/local/composer72
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/composer72
-RUN ln -s /usr/local/composer72/composer.phar /usr/bin/composer72
+# 安装扩展
 
 
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.18.2/cmake-3.18.2-Linux-x86_64.tar.gz && tar xf cmake-3.18.2-Linux-x86_64.tar.gz && mv cmake-3.18.2-Linux-x86_64 /usr/local/
+ENV PATH /usr/local/cmake-3.18.2-Linux-x86_64/bin:$PATH
+RUN cmake --version
+RUN rm -rf cmake-3.18.2-Linux-x86_64 && rm -f cmake-3.18.2-Linux-x86_64.tar.gz
 
+RUN  apt-get update
+RUn  apt-get -y install libzip-dev
+RUN wget http://pecl.php.net/get/zip-1.19.0.tgz && tar -zxvf zip-1.19.0.tgz 
+RUN cd zip-1.19.0 && /usr/local/php7.2/bin/phpize  &&  ./configure --with-php-config=/usr/local/php7.2/bin/php-config  && make && make install && ls -l
+RUN echo "extension=zip.so" > /usr/local/php7.2/etc/php.ini
+RUN cat /usr/local/php7.2/etc/php.ini
+RUN  rm -rf zip-1.19.0 && rm  -f zip-1.19.0.tgz 
 
-
-
+RUN php72 -m 
 
 # install nodejs
 
@@ -259,14 +269,12 @@ USER jenkins
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/home/jenkins
 RUN ls -lh /home/jenkins/
 # Install required php tools.
-RUN /home/jenkins/composer.phar --working-dir="/home/jenkins" -n require phing/phing:2.* notfloran/phing-composer-security-checker:~1.0 \
-    phploc/phploc:* phpunit/phpunit:~4.0 pdepend/pdepend:~2.0 phpmd/phpmd:~2.2 sebastian/phpcpd:* \
-   squizlabs/php_codesniffer:* mayflower/php-codebrowser:~1.1 codeception/codeception:*
+#RUN /home/jenkins/composer.phar --working-dir="/home/jenkins" -n require phing/phing:2.* notfloran/phing-composer-security-checker:~1.0 \
+#    phploc/phploc:* phpunit/phpunit:~4.0 pdepend/pdepend:~2.0 phpmd/phpmd:~2.2 sebastian/phpcpd:* \
+#   squizlabs/php_codesniffer:* mayflower/php-codebrowser:~1.1 codeception/codeception:*
 #RUN echo "export PATH=$PATH:/home/jenkins/.composer/vendor/bin" >> /var/jenkins_home/.bashrc 
 #设置中国composer源
 RUN /home/jenkins/composer.phar config -g repo.packagist composer https://packagist.phpcomposer.com
-RUN composer72 config -g repo.packagist composer https://packagist.phpcomposer.com
-
 
 
 
