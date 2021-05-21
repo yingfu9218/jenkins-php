@@ -180,6 +180,7 @@ RUN set -eux; \
     --with-openssl \
     --with-zlib \
     --with-gd \
+    --enable-bcmath \
 
     \
 # bundled pcre does not support JIT on s390x
