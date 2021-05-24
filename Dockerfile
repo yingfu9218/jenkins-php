@@ -17,7 +17,7 @@ RUN echo "extension=mongodb.so" >> /etc/php/7.0/cli/conf.d/mongodb.ini
 
 RUN wget http://pecl.php.net/get/redis-5.3.4.tgz && tar -zxvf redis-5.3.4.tgz 
 RUN cd redis-5.3.4 &&  /usr/bin/phpize  &&  ./configure --with-php-config=/usr/bin/php-config  && make && make install && ls -l
-RUN echo "extension=redis.so" > /etc/php/7.0/cli/conf.d/redis.ini
+RUN echo "extension=redis.so" >> /etc/php/7.0/cli/conf.d/redis.ini
 RUN  rm -rf redis-5.3.4 && rm  -f redis-5.3.4.tgz
 
 
@@ -243,9 +243,16 @@ RUN  rm -rf zip-1.19.0 && rm  -f zip-1.19.0.tgz
 
 RUN wget http://pecl.php.net/get/redis-5.3.4.tgz && tar -zxvf redis-5.3.4.tgz 
 RUN cd redis-5.3.4 && /usr/local/php7.2/bin/phpize  &&  ./configure --with-php-config=/usr/local/php7.2/bin/php-config  && make && make install && ls -l
-RUN echo "extension=redis.so" > /usr/local/php7.2/etc/php.ini
+RUN echo "extension=redis.so" >> /usr/local/php7.2/etc/php.ini
 RUN cat /usr/local/php7.2/etc/php.ini
 RUN  rm -rf redis-5.3.4 && rm  -f redis-5.3.4.tgz
+
+
+RUN wget http://pecl.php.net/get/mongodb-1.5.2.tgz && tar -zxvf mongodb-1.5.2.tgz
+RUN cd mongodb-1.5.2 && /usr/local/php7.2/bin/phpize   && ./configure --with-php-config=/usr/local/php7.2/bin/php-config && make && make install
+RUN cd ../
+RUN rm -f  mongodb-1.5.2.tgz && rm -rf  mongodb-1.5.2
+RUN echo "extension=mongodb.so" >> /etc/php/7.0/cli/conf.d/mongodb.ini
 
 
 RUN php72 -m 
