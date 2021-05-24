@@ -252,7 +252,7 @@ RUN wget http://pecl.php.net/get/mongodb-1.5.2.tgz && tar -zxvf mongodb-1.5.2.tg
 RUN cd mongodb-1.5.2 && /usr/local/php7.2/bin/phpize   && ./configure --with-php-config=/usr/local/php7.2/bin/php-config && make && make install
 RUN cd ../
 RUN rm -f  mongodb-1.5.2.tgz && rm -rf  mongodb-1.5.2
-RUN echo "extension=mongodb.so" >> /etc/php/7.0/cli/conf.d/mongodb.ini
+RUN echo "extension=mongodb.so" >> /usr/local/php7.2/etc/php.ini
 
 
 RUN php72 -m 
