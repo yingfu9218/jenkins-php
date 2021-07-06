@@ -1,32 +1,31 @@
 FROM jenkins/jenkins:2.167
 # if we want to install via apt
 USER root
-# 时区设置
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime \
-  && echo 'Asia/Shanghai' >/etc/timezone 
-RUN apt-get update && apt-get install -y php  curl php-curl php-pear  php-xdebug  php-gd php-mbstring  php-mcrypt php-xml php-mysql php-bcmath php-dev php-zip  ant rsync vim 
 
+# 时区设置
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone
+
+######
+
+# php安装
+RUN apt-get update && apt-get install -y php  curl php-curl php-pear  php-xdebug  php-gd php-mbstring  php-mcrypt php-xml php-mysql php-bcmath php-dev php-zip  ant rsync vim
+
+# php安装 mongodb 扩展
 RUN wget http://pecl.php.net/get/mongodb-1.5.2.tgz && tar -zxvf mongodb-1.5.2.tgz
 RUN cd mongodb-1.5.2 && /usr/bin/phpize && ./configure --with-php-config=/usr/bin/php-config && make && make install
 RUN cd ../
 RUN rm -f  mongodb-1.5.2.tgz && rm -rf  mongodb-1.5.2
-
 RUN echo "extension=mongodb.so" >> /etc/php/7.0/cli/conf.d/mongodb.ini
 
-# 安装redis 扩展
-
+# php安装 redis 扩展
 RUN wget http://pecl.php.net/get/redis-5.3.4.tgz && tar -zxvf redis-5.3.4.tgz 
 RUN cd redis-5.3.4 &&  /usr/bin/phpize  &&  ./configure --with-php-config=/usr/bin/php-config  && make && make install && ls -l
 RUN echo "extension=redis.so" >> /etc/php/7.0/cli/conf.d/redis.ini
 RUN  rm -rf redis-5.3.4 && rm  -f redis-5.3.4.tgz
 
+######
 
-
-
-
-# 安装PHP7.2 版本
-
-
+# PHP7.2安装
 RUN set -eux; \
   { \
     echo 'Package: php*'; \
@@ -46,7 +45,6 @@ ENV PHPIZE_DEPS \
     make \
     pkg-config \
     re2c
-
 # persistent / runtime deps
 RUN apt-get update;
 RUN apt-get install -y apt-utils
@@ -59,7 +57,7 @@ RUN set -eux; \
     xz-utils \
   ; \
   rm -rf /var/lib/apt/lists/*
-
+#
 RUN mkdir  /usr/local/php7.2
 ENV PHP_INI_DIR /usr/local/php7.2/etc
 RUN set -eux; \
@@ -77,13 +75,10 @@ RUN set -eux; \
 ENV PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 ENV PHP_CPPFLAGS="$PHP_CFLAGS"
 ENV PHP_LDFLAGS="-Wl,-O1 -pie"
-
 ENV GPG_KEYS 1729F83938DA44E27BA0F4D3DBDB397470D12172 B1B44D8F021E4E2D6021E995DC9FF8D3EE5AF27F
-
 ENV PHP_VERSION 7.2.32
 ENV PHP_URL="https://www.php.net/distributions/php-7.2.32.tar.xz" PHP_ASC_URL="https://www.php.net/distributions/php-7.2.32.tar.xz.asc"
 ENV PHP_SHA256="050fc16ca56d8d2365d980998220a4eb06439da71dfd38de49b42fea72310ef1" PHP_MD5=""
-
 RUN set -eux; \
   \
   savedAptMark="$(apt-mark showmanual)"; \
@@ -99,11 +94,8 @@ RUN set -eux; \
   apt-mark auto '.*' > /dev/null; \
   apt-mark manual $savedAptMark > /dev/null; \
   apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
-
 COPY docker-php-source /usr/local/bin/
 RUN  chmod +x /usr/local/bin/docker-php-source
-
-
 
 RUN set -eux; \
   \
@@ -181,7 +173,6 @@ RUN set -eux; \
     --with-zlib \
     --with-gd \
     --enable-bcmath \
-
     \
 # bundled pcre does not support JIT on s390x
 # https://manpages.debian.org/stretch/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
@@ -222,14 +213,13 @@ RUN set -eux; \
 RUN ln -s  /usr/local/php7.2/bin/php /usr/bin/php72
 RUN  php72 --version
 
-# 安装扩展
-
-
+# 系统安装cmake扩展
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.18.2/cmake-3.18.2-Linux-x86_64.tar.gz && tar xf cmake-3.18.2-Linux-x86_64.tar.gz && mv cmake-3.18.2-Linux-x86_64 /usr/local/
 ENV PATH /usr/local/cmake-3.18.2-Linux-x86_64/bin:$PATH
 RUN cmake --version
 RUN rm -rf cmake-3.18.2-Linux-x86_64 && rm -f cmake-3.18.2-Linux-x86_64.tar.gz
 
+# PHP7.2安装 zip 扩展
 RUN  apt-get update
 RUn  apt-get -y install libzip-dev
 RUN wget http://pecl.php.net/get/zip-1.19.0.tgz && tar -zxvf zip-1.19.0.tgz 
@@ -238,40 +228,54 @@ RUN echo "extension=zip.so" > /usr/local/php7.2/etc/php.ini
 RUN cat /usr/local/php7.2/etc/php.ini
 RUN  rm -rf zip-1.19.0 && rm  -f zip-1.19.0.tgz 
 
-
-# 安装redis 扩展
-
+# PHP7.2安装 redis 扩展
 RUN wget http://pecl.php.net/get/redis-5.3.4.tgz && tar -zxvf redis-5.3.4.tgz 
 RUN cd redis-5.3.4 && /usr/local/php7.2/bin/phpize  &&  ./configure --with-php-config=/usr/local/php7.2/bin/php-config  && make && make install && ls -l
 RUN echo "extension=redis.so" >> /usr/local/php7.2/etc/php.ini
 RUN cat /usr/local/php7.2/etc/php.ini
 RUN  rm -rf redis-5.3.4 && rm  -f redis-5.3.4.tgz
 
-
+# PHP7.2安装 mongodb 扩展
 RUN wget http://pecl.php.net/get/mongodb-1.5.2.tgz && tar -zxvf mongodb-1.5.2.tgz
 RUN cd mongodb-1.5.2 && /usr/local/php7.2/bin/phpize   && ./configure --with-php-config=/usr/local/php7.2/bin/php-config && make && make install
 RUN cd ../
 RUN rm -f  mongodb-1.5.2.tgz && rm -rf  mongodb-1.5.2
 RUN echo "extension=mongodb.so" >> /usr/local/php7.2/etc/php.ini
 
-
-RUN php72 -m 
-
-
-# install nodejs
-
-RUN wget https://nodejs.org/dist/v10.13.0/node-v10.13.0-linux-x64.tar.xz && xz -d node-v10.13.0-linux-x64.tar.xz && tar -xvf node-v10.13.0-linux-x64.tar && rm -f node-v10.13.0-linux-x64.tar.xz  && mv node-v10.13.0-linux-x64 /usr/local/node
+RUN php72 -m
 
 
- 
+######
+
+
+# 安装 node v10.13.0  默认
+RUN wget https://nodejs.org/dist/v10.13.0/node-v10.13.0-linux-x64.tar.xz && \
+xz -d node-v10.13.0-linux-x64.tar.xz && \
+tar -xvf node-v10.13.0-linux-x64.tar && \
+rm -f node-v10.13.0-linux-x64.tar.xz  && \
+mv node-v10.13.0-linux-x64 /usr/local/node
+# 添加环境变量
 ENV PATH /usr/local/node/bin:$PATH
-
-
+# 补充node全局库
 RUN npm install -g cnpm --registry=http://registry.npm.taobao.org
 RUN npm install -g @vue/cli
 
-# 安装puppeteer依赖环境
 
+# 安装 node v14.16.0
+RUN wget https://nodejs.org/dist/v14.16.0/node-v14.16.0-linux-x64.tar.xz && \
+xz -d node-v14.16.0-linux-x64.tar.xz && \
+tar -xvf node-v14.16.0-linux-x64.tar && \
+rm -f node-v14.16.0-linux-x64.tar.xz  && \
+mv node-v14.16.0-linux-x64 /usr/local/node14
+# 补充node14全局库
+RUN /usr/local/node14/bin/npm install -g cnpm --registry=http://registry.npm.taobao.org
+RUN /usr/local/node14/bin/npm install -g @vue/cli
+
+
+######
+
+
+# 安装puppeteer依赖环境
 RUN apt-get update && \
     apt-get -y install xvfb gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 \
       libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 \
@@ -280,27 +284,28 @@ RUN apt-get update && \
       libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget && \
     rm -rf /var/lib/apt/lists/*
 
+# 添加用户组
 RUN  groupadd -r pptruser \
-   &&  usermod -a -G audio jenkins \
-    && usermod -a -G video jenkins \
-    && usermod -a -G pptruser jenkins \
-    && mkdir -p /home/pptruser/Downloads \
-    && chown -R jenkins:jenkins /home/pptruser
-
-
+&&  usermod -a -G audio jenkins \
+&& usermod -a -G video jenkins \
+&& usermod -a -G pptruser jenkins \
+&& mkdir -p /home/pptruser/Downloads \
+&& chown -R jenkins:jenkins /home/pptruser
+# 添加jenkins所有者权限
 RUN mkdir /home/jenkins
 RUN chown jenkins:jenkins /home/jenkins
 USER jenkins
-# Install composer, yes we can't install it in $JENKINS_HOME :(
+
+# 安装 composer, yes we can't install it in $JENKINS_HOME :(
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/home/jenkins
 RUN ls -lh /home/jenkins/
+
 # Install required php tools.
 #RUN /home/jenkins/composer.phar --working-dir="/home/jenkins" -n require phing/phing:2.* notfloran/phing-composer-security-checker:~1.0 \
 #    phploc/phploc:* phpunit/phpunit:~4.0 pdepend/pdepend:~2.0 phpmd/phpmd:~2.2 sebastian/phpcpd:* \
 #   squizlabs/php_codesniffer:* mayflower/php-codebrowser:~1.1 codeception/codeception:*
 #RUN echo "export PATH=$PATH:/home/jenkins/.composer/vendor/bin" >> /var/jenkins_home/.bashrc 
+
 #设置中国composer源
 RUN /home/jenkins/composer.phar config -g repo.packagist composer https://packagist.phpcomposer.com
-
-
 
