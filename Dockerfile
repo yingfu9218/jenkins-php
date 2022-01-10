@@ -8,7 +8,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime && echo 'Asia/Shang
 ######
 
 # php安装
-RUN apt-get update && apt-get install -y php  curl php-curl php-pear  php-xdebug  php-gd php-mbstring  php-mcrypt php-xml php-mysql php-bcmath php-dev php-zip  ant rsync vim
+RUN apt-get update && apt-get install -y php  curl php-curl php-pear  php-xdebug  php-gd php-mbstring  php-mcrypt php-xml php-mysql php-bcmath php-dev php-zip  ant rsync vim 
 
 # php安装 mongodb 扩展
 RUN wget http://pecl.php.net/get/mongodb-1.5.2.tgz && tar -zxvf mongodb-1.5.2.tgz
@@ -113,7 +113,7 @@ RUN set -eux; \
   } > /etc/apt/preferences.d/argon2-buster; \
 ##</argon2-stretch>##
   apt-get update; \
-  apt-get install -y --no-install-recommends \
+  apt-get install -y --no-install-recommends --allow-unauthenticated \
     libargon2-dev \
     libcurl4-openssl-dev \
     libedit-dev \
@@ -173,6 +173,7 @@ RUN set -eux; \
     --with-zlib \
     --with-gd \
     --enable-bcmath \
+    --enable-sockets \
     \
 # bundled pcre does not support JIT on s390x
 # https://manpages.debian.org/stretch/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
@@ -242,6 +243,9 @@ RUN cd ../
 RUN rm -f  mongodb-1.5.2.tgz && rm -rf  mongodb-1.5.2
 RUN echo "extension=mongodb.so" >> /usr/local/php7.2/etc/php.ini
 
+# 开启sockets 扩展
+RUN echo "extension=sockets.so" >> /usr/local/php7.2/etc/php.ini
+
 RUN php72 -m
 
 
@@ -249,8 +253,8 @@ RUN php72 -m
 
 
 # 安装 node v10.13.0  默认
-RUN wget https://nodejs.org/dist/v10.13.0/node-v10.13.0-linux-x64.tar.xz && \
-xz -d node-v10.13.0-linux-x64.tar.xz && \
+RUN wget https://nodejs.org/dist/v10.13.0/node-v10.13.0-linux-x64.tar.xz 
+RUN xz -d node-v10.13.0-linux-x64.tar.xz && \
 tar -xvf node-v10.13.0-linux-x64.tar && \
 rm -f node-v10.13.0-linux-x64.tar.xz  && \
 mv node-v10.13.0-linux-x64 /usr/local/node
